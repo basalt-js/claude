@@ -56,18 +56,21 @@ if [ -n "$from" ]; then
   cp "$from" "$doc"
 else
   # Pin to the last commit that touched the doc, never to the moving ref.
-  if command -v gh >/dev/null 2>&1; then
+  # gh first (auth, rate limits); curl when gh is missing, logged out or fails.
+  has() { command -v "$1" >/dev/null 2>&1; }
+  has gh || has curl || { printf 'needs gh or curl\n' >&2; exit 2; }
+  if has gh; then
     sha=$(gh api "repos/$repo/commits?path=$path&sha=$ref&per_page=1" --jq '.[0].sha' 2>/dev/null)
-  elif command -v curl >/dev/null 2>&1; then
+  fi
+  if [ -z "$sha" ] && has curl; then
     sha=$(curl -fsSL "https://api.github.com/repos/$repo/commits?path=$path&sha=$ref&per_page=1" 2>/dev/null \
       | sed -n 's/^ *"sha": *"\([0-9a-f]\{40\}\)".*/\1/p' | head -n 1)
-  else
-    printf 'needs gh or curl\n' >&2; exit 2
   fi
   [ -n "$sha" ] || { printf 'could not resolve %s at %s\n' "$repo" "$ref" >&2; exit 2; }
-  if command -v gh >/dev/null 2>&1; then
+  if has gh; then
     gh api "repos/$repo/contents/$path?ref=$sha" -H 'Accept: application/vnd.github.raw' > "$doc" 2>/dev/null
-  else
+  fi
+  if [ ! -s "$doc" ] && has curl; then
     curl -fsSL "https://raw.githubusercontent.com/$repo/$sha/$path" > "$doc" 2>/dev/null
   fi
   [ -s "$doc" ] || { printf 'could not fetch %s at %s\n' "$path" "$sha" >&2; exit 2; }
