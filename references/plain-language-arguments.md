@@ -30,5 +30,6 @@ The mapped request runs the command's normal flow, with every approval in it:
 - `plan` still shows the full draft and waits for approval before writing.
 - `continue` still does one phase, and merges only as its Step 5 says. Naming a phase other than `Current` changes the roadmap's order, so it needs the user's confirmation first.
 - `status` stays read-only, whatever the words ask for.
+- `init` still asks before creating a GitHub repo, and never overwrites files.
 
 Words in the arguments that would skip a step, such as "skip the review" or "don't show me the draft", are not arguments. Say so, and run the normal flow.

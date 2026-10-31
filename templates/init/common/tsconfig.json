@@ -1,0 +1,9 @@
+{
+  "extends": "@basalt-js/ci/tsconfig.base.json",
+  "compilerOptions": {
+    // No runtime's globals are in scope by default. Add "bun" or "node" here (and the
+    // matching @types package) once the project targets one runtime.
+    "types": []
+  },
+  "include": ["src", "tests", "*.config.ts"]
+}

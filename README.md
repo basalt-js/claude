@@ -12,6 +12,7 @@ Every command takes plain words as well as its exact arguments, for example `/ba
 
 | Command | What it does |
 |---|---|
+| `/basalt:init` | Sets up a new project in an empty folder: the latest `@basalt-js/ci` tooling with its Biome, ESLint and TypeScript configs, the standard scripts, CI, the Claude PR review and `main` protection. Ends with `bun run check` passing, then hands over to `/basalt:plan`. |
 | `/basalt:plan` | Asks what you're building and drafts a roadmap of milestones and phases. Once you approve it, writes `.basalt/roadmap.md` and `.basalt/progress.md`. |
 | `/basalt:continue` | Reads where the last session stopped and does the next phase on its own branch. It runs the phase's checks, updates progress, and opens a pull request. It fixes what CI or the Claude review rejects, squash-merges once both pass, and stops. Run it again in a fresh conversation for the next phase. |
 | `/basalt:status` | Shows the current milestone and phase, what's done, and what's next. Changes nothing. |
@@ -35,15 +36,16 @@ It bundles Basalt's design doc as the `basalt-core` skill: one file per section 
 |---|---|
 | `.claude-plugin/` | Plugin and marketplace manifests |
 | `commands/` | The `/basalt:*` commands |
-| `templates/` | The roadmap and progress templates the commands follow |
+| `templates/` | The roadmap and progress templates the commands follow, and `init/`, the files `/basalt:init` writes |
 | `references/` | Rules every command shares, such as how plain-language arguments are read |
 | `skills/basalt-core/` | The core design doc, split by section, with an index |
+| `scripts/init-project.sh` | Writes and installs a new project for `/basalt:init` |
 | `scripts/sync-basalt-core.sh` | Refreshes `skills/basalt-core/` from `basalt-js/core` |
 | `hooks/` | Session-start and post-compaction context |
 | `docs/design.md` | The design: every idea, decision and open question |
 | `.basalt/` | This plugin's own roadmap and progress: it is built with its own workflow |
 
-Check the plugin with `claude plugin validate .`.
+Check the plugin with `claude plugin validate .` and `bash tests/run.sh`.
 
 ## License
 

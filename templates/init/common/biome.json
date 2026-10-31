@@ -1,0 +1,4 @@
+{
+  "$schema": "https://biomejs.dev/schemas/{{biome_version}}/schema.json",
+  "extends": ["@basalt-js/ci/biome"]
+}

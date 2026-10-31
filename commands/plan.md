@@ -35,6 +35,8 @@ If `.basalt/roadmap.md` already exists, do **not** overwrite it. Show the user i
 
 ## Step 2: Understand the project
 
+If the folder has no `package.json` and the user is starting a new Basalt project, suggest `/basalt:init` first; it sets up the tooling and comes back here. Plan anyway if they prefer.
+
 Read what already exists before asking anything: `README.md`, `CLAUDE.md`, `package.json`, any design or spec documents, and the top-level layout. If the project uses Basalt, note which framework and plugins it already has.
 
 Then, starting from the description in the arguments if there is one, ask the user only what you genuinely can't work out: the goal, what "done" looks like, hard constraints, and what matters most. Use AskUserQuestion, at most four questions at once, each with a recommended option. Don't ask about things the code already answers.
