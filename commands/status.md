@@ -19,6 +19,8 @@ Read it by the rules in `${CLAUDE_PLUGIN_ROOT}/references/plain-language-argumen
 - `<milestone id>`, such as `M2`: the report, then that milestone in detail: its Exit check and each phase with its tick and Done-when check.
 - `<phase id>`, such as `P2.1`: the report, then that phase: its goal, its Done-when check, and its commit if it is done.
 
+An id that isn't in the roadmap, such as `P9.9`: say so, list the milestone ids, and give the normal report.
+
 In plain words, a milestone or phase named by its id or its title becomes the id. A question about the position, such as "is anything waiting on me", is read as empty and answered in the report.
 
 | The user typed | Read as |

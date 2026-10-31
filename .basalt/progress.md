@@ -13,7 +13,7 @@ Last done: P1.4 Plain-language arguments (D7a)
 - Hooks are plain bash with no python3 or jq dependency; JSON is escaped by hand (P1.1). Tests may use node (P1.2).
 - `roadmap.md` and `progress.md` are committed; only `.basalt/session/` is local (P1.1).
 - D6: `/basalt:init` and `/basalt:check` are in M1 (P1.6, P1.7). D7: moku conventions (P1.4, P1.5, P1.8).
-- D8: every change lands as a reviewed PR on a `basalt/<phase>` branch. The review is a reusable workflow in basalt-js/ci with thin `claude-review.yml` callers, runs with `GITHUB_TOKEN`, and fails its check on `reject`. `Last done` names the phase; commit subjects end with the phase id (P1.3).
+- D8: every change lands as a reviewed PR on a `basalt/<phase>` branch. The review is a reusable workflow in basalt-js/ci with thin `claude-review.yml` callers, runs with `GITHUB_TOKEN`, and fails its check on `reject`. `Last done` names the phase; commit subjects end with the phase id. Drafts and fork PRs skip the review; a session that stops mid-phase opens a draft PR, and the next `/basalt:continue` picks up an unmerged `basalt/…` PR. Details: `commands/continue.md` Step 5 and `basalt-js/ci`'s `pr-review.yml` (P1.3).
 - The review model is Claude Opus 5.5, set by `pr-review.yml`'s `model` input (2026-10-31, after P1.3).
 - Plain-language rules live in one file, `references/plain-language-arguments.md`; each command has an "Arguments" section with its exact form and examples (P1.4).
 - Exact forms (P1.4): `plan new "<description>"` / `revise "<change>"`; `continue [<phase id>] ["<note>"]`; `status [<milestone or phase id>]`. `continue` with a phase other than the next one asks first, since that reorders the roadmap.
