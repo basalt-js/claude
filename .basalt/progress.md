@@ -5,7 +5,7 @@ Last done: P1.6 `/basalt:init`
 
 ## State
 
-`claude plugin validate .` passes. `bash tests/run.sh` passes (80 tests: the hook, `sync-basalt-core.sh`, and `init-project.sh` in files-only mode, which needs bun). CI runs them on Ubuntu, macOS (also /bin/bash 3.2) and Windows Git Bash; a new `init` job runs the real install and `bun run check` for both kinds (not a required check yet). Every PR gets the Claude review (`claude / review`, required on `main`). `skills/basalt-core/` is pinned to core `1a7c213`.
+`claude plugin validate .` passes. `bash tests/run.sh` passes (81 tests: the hook, `sync-basalt-core.sh`, and `init-project.sh` in files-only mode, which needs bun). CI runs them on Ubuntu, macOS (also /bin/bash 3.2) and Windows Git Bash; a new `init` job runs the real install and `bun run check` for both kinds (not a required check yet). Every PR gets the Claude review (`claude / review`, required on `main`). `skills/basalt-core/` is pinned to core `1a7c213`.
 
 ## Decisions
 

@@ -71,7 +71,7 @@ files=$( (cd "$templates/common" && find . -type f; cd "$templates/$kind" && fin
 
 # Never overwrite. README.md and .gitignore are kept if present (.gitignore gets our lines).
 conflicts=
-[ -e package.json ] && conflicts="$conflicts package.json"
+for t in package.json .bun-version; do [ -e "$t" ] && conflicts="$conflicts $t"; done
 for f in $files; do
   t=$(target_of "$f")
   case "$t" in README.md|.gitignore) continue ;; esac

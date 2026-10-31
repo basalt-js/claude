@@ -335,6 +335,12 @@ if command -v bun >/dev/null 2>&1; then
   [ ! -e "$dir/package.json" ] && [ "$(cat "$dir/biome.json")" = mine ] \
     && pass "init: writes nothing on conflict" || fail "init: writes nothing on conflict" "files written"
 
+  dir="$tmp/init-bun-version"
+  mkdir -p "$dir" && printf '1.0.0
+' > "$dir/.bun-version"
+  out=$(bash "$init" --kind app --name x --dir "$dir" --no-install 2>&1); code=$?
+  [ "$code" -eq 2 ] && [ "$(cat "$dir/.bun-version")" = 1.0.0 ]     && pass "init: keeps an existing .bun-version, exit 2" || fail "init: keeps an existing .bun-version, exit 2" "exit $code: $out"
+
   out=$(bash "$init" --kind app --name Bad_Name --dir "$tmp/init-bad" --no-install 2>&1); code=$?
   [ "$code" -eq 2 ] && pass "init: invalid npm name, exit 2" || fail "init: invalid npm name, exit 2" "exit $code: $out"
   out=$(bash "$init" --kind lib --name x --dir "$tmp/init-bad" --no-install 2>&1); code=$?

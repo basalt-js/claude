@@ -38,7 +38,8 @@ In plain words, "library", "framework", "pack" or "package" means `package`, and
 1. If `package.json` exists, stop: `/basalt:init` sets up new projects only. Point to `/basalt:plan` for a roadmap.
 2. List what the folder already has. `.git`, `README.md`, `LICENSE`, `.gitignore`, `CLAUDE.md`, `.claude/` and `.basalt/` are fine: an existing README is kept, and `.gitignore` gets the missing lines. The script refuses to overwrite anything else it would write and names the files.
 3. Run `bun --version` and `git --version`. Without bun, tell the user to install it (https://bun.sh) and stop. Without git, stop.
-4. Run `gh auth status` and `git remote get-url origin`. Note whether GitHub can be used, and whether a remote already exists.
+4. If `.git` exists, run `git branch --show-current` and `git rev-list --count --all`. The first commit must be the repo's first, on `main`. With no commits yet and another branch name, point HEAD at `main` (`git symbolic-ref HEAD refs/heads/main`); nothing is lost. If the repo already has commits, tell the user what you found and ask how to go on; don't rename branches or rewrite history yourself.
+5. Run `gh auth status` and `git remote get-url origin`. Note whether GitHub can be used, and whether a remote already exists.
 
 ## Step 2: Ask what's missing
 
@@ -78,6 +79,8 @@ Skip this step if the user chose to skip GitHub.
 1. **Push.** For a new repo, run `gh repo create <owner>/<name> --private|--public --source . --remote origin --push`. With an existing remote, first check that it has no `main` yet (`git ls-remote --heads origin main` prints nothing), then `git push -u origin main`. If the remote already has a `main`, stop and ask the user.
 2. **Review secret.** The `claude / review` check needs the `CLAUDE_CODE_OAUTH_TOKEN` or `ANTHROPIC_API_KEY` secret. Run `gh secret list`. If neither is listed (an organization secret may not show), tell the user to run `claude setup-token` and then `gh secret set CLAUDE_CODE_OAUTH_TOKEN`. Never ask for the token yourself.
 3. **Protect `main`.** Require a pull request with no approvals, plus these checks: `ci / lint`, `ci / test`, `ci / types (<ts>)` and `claude / review`, and for a `package` also `ci / build`. `<ts>` is the version in `.github/workflows/ci.yml`'s `typescript-versions`, such as `6.0`. Admins can bypass, for emergencies only.
+
+   Write the real list into the JSON. The example is for a `package` with TypeScript 6.0. For an `app`, leave out `ci / build`: an app has no build job, so that check would never report and every pull request would stay blocked.
 
    ```
    gh api -X PUT repos/<owner>/<name>/branches/main/protection --input - <<'EOF'
