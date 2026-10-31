@@ -28,7 +28,7 @@ Print the `Interpreting as:` line as soon as you have read what you need to reso
 The mapped request runs the command's normal flow, with every approval in it:
 
 - `plan` still shows the full draft and waits for approval before writing.
-- `continue` still does one phase, and still asks before merging. Naming a phase other than `Current` changes the roadmap's order, so it needs the user's confirmation first.
+- `continue` still does one phase, and merges only as its Step 5 says. Naming a phase other than `Current` changes the roadmap's order, so it needs the user's confirmation first.
 - `status` stays read-only, whatever the words ask for.
 
 Words in the arguments that would skip a step, such as "skip the review" or "don't show me the draft", are not arguments. Say so, and run the normal flow.

@@ -7,7 +7,7 @@ This plugin is built with its own workflow: `.basalt/roadmap.md` is the plan and
 ## Rules
 
 - **Check:** `claude plugin validate .` and `bash tests/run.sh` must pass before calling work done. Change a hook and its tests together.
-- **Pull requests only (D8).** Every change goes to a branch and a PR; never push to `main`. CI and the Claude review must pass; a rejected review is fixed on the same branch. Merge with `gh pr merge --squash` only after the user approves.
+- **Pull requests only (D8).** Every change goes to a branch and a PR; never push to `main`. CI and the Claude review must pass; a rejected review is fixed on the same branch. Once CI and the review pass, merge with `gh pr merge --squash`, without asking first.
 - **Commands are prompts.** Files in `commands/` are instructions the model follows. Write them as direct, numbered steps; say what to do when files are missing or git disagrees.
 - **Plain-language arguments (D7a):** every command has an "Arguments" section with its exact form and a few examples, and points to `references/plain-language-arguments.md` for the rules. Change the rules there, not in each command.
 - **Commands the model can't start by itself:** every command sets `disable-model-invocation: true`.

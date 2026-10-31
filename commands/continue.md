@@ -7,7 +7,7 @@ disable-model-invocation: true
 
 # /basalt:continue
 
-Do exactly one phase of the roadmap, from start to a clean finish. Each phase gets its own session, so conversations stay small. Each phase lands as one pull request: it is worked on a branch, reviewed, and squash-merged only after the user approves.
+Do exactly one phase of the roadmap, from start to a clean finish. Each phase gets its own session, so conversations stay small. Each phase lands as one pull request: it is worked on a branch, reviewed, and squash-merged once CI and the review pass.
 
 ## Arguments
 
@@ -66,8 +66,7 @@ If the repository has no GitHub remote, or `gh auth status` fails, skip this ste
 2. Wait for the checks: run `gh pr checks <number> --watch --interval 30` in the background and wait until it finishes. The checks are CI plus, where the repository has one, the Claude review (`claude / review`).
 3. **CI failed:** read the failing log (`gh run view <run id> --log-failed`), fix the cause on the same branch, commit, push, and go back to 2.
 4. **The review rejected:** read its latest comment, which starts with `<!-- basalt-review -->`: `gh pr view <number> --json comments --jq '[.comments[] | select(.body | startswith("<!-- basalt-review -->"))] | last | .body'`. Fix every blocking finding on the same branch, commit, push, and go back to 2. Apply a suggestion only when it is small and inside the phase's goal. If you think a blocking finding is wrong, ask the user instead of pushing around it. After three rejected rounds, stop and ask the user how to go on.
-5. **Everything passes:** ask the user whether to merge, with AskUserQuestion. Give the PR link and the review's summary. Only an answer in this session counts; an approval from an earlier session or PR does not.
-6. **Approved:** `gh pr merge <number> --squash --delete-branch`, then `git switch main` and `git pull --ff-only`. **Not yet:** leave the PR open; the next `/basalt:continue` picks it up at this step.
+5. **Everything passes:** merge without asking: `gh pr merge <number> --squash --delete-branch`, then `git switch main` and `git pull --ff-only`. The exception: if the user asked in this session to see the PR before it merges, ask them with AskUserQuestion, giving the PR link and the review's summary. If they say not yet, leave the PR open; the next `/basalt:continue` picks it up at this step.
 
 ## Step 6: Stop
 
