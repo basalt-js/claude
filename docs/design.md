@@ -16,6 +16,7 @@
 | D5 | The mascot overlay app **lives in the plugin repo**, under `mascot/`. Its per-OS builds are published as release downloads of that repo. |
 | D6 | `/basalt:init` and `/basalt:check` are part of M1 (see "Commands" below). |
 | D7 | Every command follows three conventions taken from moku: (a) plain-language arguments, (b) bundled knowledge read index-first, (c) unattended runs only on request (see "Conventions for every command" below). |
+| D8 | Every change lands as a pull request: a branch per phase, CI and a Claude Code Action review must pass, a rejected review is fixed on the same branch, and the PR is squash-merged only after the user approves. `main` is protected (PR and CI required, admin bypass for emergencies). Applies to the basalt-js repos and to projects run with `/basalt:continue` (roadmap P1.3). |
 
 ---
 
