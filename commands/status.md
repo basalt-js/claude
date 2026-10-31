@@ -38,7 +38,7 @@ In plain words, a milestone or phase named by its id or its title becomes the id
 3. Reply with:
    - **Position:** current milestone and phase, and `<done>/<total>` phases ticked overall and in the current milestone.
    - **Last done:** the last finished phase, and its commit on `main` if `git log --grep` finds one.
-   - **Open PR:** a phase PR waiting on review or on the user's approval, with its link, if any.
+   - **Open PR:** a phase PR that is still open (checks running, a rejected review being fixed, or held for the user), with its link, if any.
    - **Next:** the current phase's goal and its "Done when" check.
    - **Partial work, blockers, or questions waiting on the user**, if any.
    - **Mismatches** between `progress.md` and git, if any, with a note that `/basalt:continue` will reconcile them.
