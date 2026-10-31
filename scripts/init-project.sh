@@ -99,7 +99,8 @@ for f in $files; do
   [ -f "$src" ] || src="$templates/common/$f"
   t=$(target_of "$f")
   if [ "$t" = .gitignore ] && [ -e .gitignore ]; then
-    # Keep the user's file; add the lines it lacks.
+    # Keep the user's file; add the lines it lacks, starting on a new line.
+    [ -s .gitignore ] && [ -n "$(tail -c 1 .gitignore)" ] && printf '\n' >> .gitignore
     while IFS= read -r line; do
       [ -z "$line" ] || grep -qxF -- "$line" .gitignore || printf '%s\n' "$line" >> .gitignore
     done < "$src"

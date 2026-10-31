@@ -312,7 +312,7 @@ if command -v bun >/dev/null 2>&1; then
   expect_contains "init package: lefthook trusted" '"lefthook"' "$pkg"
 
   dir="$tmp/init-app"
-  mkdir -p "$dir" && printf '# Mine\n' > "$dir/README.md" && printf 'secret.txt\nnode_modules/\n' > "$dir/.gitignore"
+  mkdir -p "$dir" && printf '# Mine\n' > "$dir/README.md" && printf 'node_modules/\nsecret.txt' > "$dir/.gitignore"
   bash "$init" --kind app --name my-app --dir "$dir" --no-install >/dev/null 2>&1
   pkg=$(cat "$dir/package.json")
   expect_contains "init app: private" '"private": true' "$pkg"
@@ -322,7 +322,8 @@ if command -v bun >/dev/null 2>&1; then
   expect_contains "init app: CI without the build job" 'build: false' "$(cat "$dir/.github/workflows/ci.yml")"
   [ "$(cat "$dir/README.md")" = '# Mine' ] && pass "init: existing README kept" || fail "init: existing README kept" "README overwritten"
   gi=$(cat "$dir/.gitignore")
-  expect_contains "init: existing .gitignore kept" 'secret.txt' "$gi"
+  [ "$(grep -cx 'secret.txt' "$dir/.gitignore")" -eq 1 ] && pass "init: .gitignore without a final newline keeps its last line" \
+    || fail "init: .gitignore without a final newline keeps its last line" "$(tail -n 3 "$dir/.gitignore")"
   expect_contains "init: .gitignore gets missing lines" '.basalt/session/' "$gi"
   [ "$(grep -cx 'node_modules/' "$dir/.gitignore")" -eq 1 ] && pass "init: .gitignore lines not duplicated" \
     || fail "init: .gitignore lines not duplicated" "node_modules/ repeated"
