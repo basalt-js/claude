@@ -1,6 +1,7 @@
 ---
 description: Show where the project is in its roadmap. Read-only.
 allowed-tools: Read, Bash, Glob, Grep
+disable-model-invocation: true
 ---
 
 # /basalt:status
