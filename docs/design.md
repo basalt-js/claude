@@ -16,7 +16,7 @@
 | D5 | The mascot overlay app **lives in the plugin repo**, under `mascot/`. Its per-OS builds are published as release downloads of that repo. |
 | D6 | `/basalt:init` and `/basalt:check` are part of M1 (see "Commands" below). |
 | D7 | Every command follows three conventions taken from moku: (a) plain-language arguments, (b) bundled knowledge read index-first, (c) unattended runs only on request (see "Conventions for every command" below). |
-| D8 | Every change lands as a pull request: a branch per phase, CI and a Claude Code Action review must pass, a rejected review is fixed on the same branch, and the PR is squash-merged only after the user approves. `main` is protected (PR and CI required, admin bypass for emergencies). Applies to the basalt-js repos and to projects run with `/basalt:continue` (roadmap P1.3). |
+| D8 | Every change lands as a pull request: a branch per phase, CI and a Claude Code Action review must pass, a rejected review is fixed on the same branch, and the PR is squash-merged as soon as CI and the review pass, with no approval question (changed from "after the user approves" on 2026-10-31). `main` is protected (PR and CI required, admin bypass for emergencies). Applies to the basalt-js repos and to projects run with `/basalt:continue` (roadmap P1.3). |
 
 ---
 
@@ -122,7 +122,7 @@ Each session ends cleanly at a phase boundary: the phase is done, progress is wr
 2. Checks them against `git status` and `git log`. Git wins if they disagree, and the agent says so.
 3. Opens the "read first" files.
 4. Says in one or two lines where it is picking up, then starts the next phase.
-5. At the end of the phase: runs the exit checks, updates progress, commits on the phase branch and opens a PR. It fixes what CI or the Claude review rejects, squash-merges once the user approves, and stops, so the next phase gets a fresh session.
+5. At the end of the phase: runs the exit checks, updates progress, commits on the phase branch and opens a PR. It fixes what CI or the Claude review rejects, squash-merges once CI and the review pass, and stops, so the next phase gets a fresh session.
 
 ### Changing the plan
 
@@ -130,7 +130,7 @@ Plans change. When the agent finds the roadmap is wrong (a missing phase, a wron
 
 **Open questions:**
 - Should `/basalt:continue` stop after one phase, or keep going while the session is still small?
-- ~~Commit automatically at each phase end, or ask first?~~ Answered by D8: commit and open the PR automatically, merge only after the user approves.
+- ~~Commit automatically at each phase end, or ask first?~~ Answered by D8: commit, open the PR and merge it automatically once CI and the review pass.
 - One roadmap per project, or allow parallel tracks (e.g. a `docs` track next to the main one)?
 
 ---

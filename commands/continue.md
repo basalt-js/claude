@@ -1,21 +1,39 @@
 ---
 description: Pick up the roadmap where the last session stopped and do the next phase.
 allowed-tools: Read, Write, Edit, Bash, Glob, Grep, AskUserQuestion, Agent
-argument-hint: [optional note for this session]
+argument-hint: [phase id] [note for this session]
 disable-model-invocation: true
 ---
 
 # /basalt:continue
 
-Do exactly one phase of the roadmap, from start to a clean finish. Each phase gets its own session, so conversations stay small. Each phase lands as one pull request: it is worked on a branch, reviewed, and squash-merged only after the user approves.
+Do exactly one phase of the roadmap, from start to a clean finish. Each phase gets its own session, so conversations stay small. Each phase lands as one pull request: it is worked on a branch, reviewed, and squash-merged once CI and the review pass.
 
-Note from the user for this session (may be empty): $ARGUMENTS
+## Arguments
+
+The user typed: $ARGUMENTS
+
+Read it by the rules in `${CLAUDE_PLUGIN_ROOT}/references/plain-language-arguments.md`. The exact form is `[<phase id>] ["<note>"]`:
+
+- Empty: the next phase, `Current` in `progress.md`, or the open phase PR that Step 1 finds.
+- `<phase id>`, such as `P2.1`: do that phase. If it isn't the one Step 1 would pick, ask the user to confirm before switching branches: doing phases out of order changes the roadmap, and the change is logged under Decisions. When an open phase PR exists for another phase, name it in the question: resume it, or leave it open and start the named phase. Say that the two PRs will then conflict on `.basalt/progress.md` and `.basalt/roadmap.md`, and record the parked PR under Blockers. For a phase run out of order, use the Read-first list and a Partial section only if they belong to that phase; otherwise read what its goal needs. A phase that is already ticked isn't redone; point to `/basalt:plan revise` instead.
+- `"<note>"`: guidance for this session, such as a focus or a constraint. Follow it while doing the phase; it never skips a step.
+
+In plain words, a phase named by its id or its title becomes the phase id, and the rest is the note. Only a note in quotes is exact; unquoted words are plain language and get the echo, even when all of them are the note.
+
+| The user typed | Read as |
+|---|---|
+| `/basalt:continue keep the commits small` | `Interpreting as: /basalt:continue "keep the commits small"` |
+| `/basalt:continue do the RSS phase, reuse the markdown pipe` | `Interpreting as: /basalt:continue P2.2 "reuse the markdown pipe"`, then confirm, if P2.2 isn't next |
+| `/basalt:continue the content phase` (M2 has several) | ask which phase, the next one in M2 first |
+| `/basalt:continue P2.1` | exact: no echo |
+| `/basalt:continue add a docs milestone` | not this command: point to `/basalt:plan revise "add a docs milestone"` |
 
 ## Step 1: Load where we are
 
 1. Read `.basalt/progress.md` and `.basalt/roadmap.md`. If either is missing, stop and tell the user to run `/basalt:plan` first.
 2. Check them against git: run `git status`, `git log --oneline -10` and `git log --oneline --grep "<last done phase id>"`. If progress says something git contradicts (a "last done" phase with no commit on `main`, uncommitted changes nobody recorded), **git wins**: tell the user what differs and correct `progress.md` before going on.
-3. Check for a phase PR that hasn't merged yet: `gh pr list --state open --json number,title,headRefName,isDraft --jq '.[] | select(.headRefName | startswith("basalt/"))'`. If there is one, switch to its branch and say you're resuming it. If its work is finished, go straight to Step 5; otherwise continue from its Partial section.
+3. Check for a phase PR that hasn't merged yet: `gh pr list --state open --json number,title,headRefName,isDraft --jq '.[] | select(.headRefName | startswith("basalt/"))'`. If there is one, switch to its branch and say you're resuming it, unless the arguments name a different phase (see Arguments). If its work is finished, go straight to Step 5; otherwise continue from its Partial section.
 4. Read every file under "Read first next time".
 
 ## Step 2: Say where you're picking up
@@ -48,8 +66,7 @@ If the repository has no GitHub remote, or `gh auth status` fails, skip this ste
 2. Wait for the checks: run `gh pr checks <number> --watch --interval 30` in the background and wait until it finishes. The checks are CI plus, where the repository has one, the Claude review (`claude / review`).
 3. **CI failed:** read the failing log (`gh run view <run id> --log-failed`), fix the cause on the same branch, commit, push, and go back to 2.
 4. **The review rejected:** read its latest comment, which starts with `<!-- basalt-review -->`: `gh pr view <number> --json comments --jq '[.comments[] | select(.body | startswith("<!-- basalt-review -->"))] | last | .body'`. Fix every blocking finding on the same branch, commit, push, and go back to 2. Apply a suggestion only when it is small and inside the phase's goal. If you think a blocking finding is wrong, ask the user instead of pushing around it. After three rejected rounds, stop and ask the user how to go on.
-5. **Everything passes:** ask the user whether to merge, with AskUserQuestion. Give the PR link and the review's summary. Only an answer in this session counts; an approval from an earlier session or PR does not.
-6. **Approved:** `gh pr merge <number> --squash --delete-branch`, then `git switch main` and `git pull --ff-only`. **Not yet:** leave the PR open; the next `/basalt:continue` picks it up at this step.
+5. **Everything passes:** merge without asking: `gh pr merge <number> --squash --delete-branch`, then `git switch main` and `git pull --ff-only`. The exception: if the user asked in this session to see the PR before it merges, ask them with AskUserQuestion, giving the PR link and the review's summary. If they say not yet, leave the PR open; the next `/basalt:continue` picks it up at this step.
 
 ## Step 6: Stop
 
