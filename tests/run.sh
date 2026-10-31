@@ -337,10 +337,16 @@ if command -v bun >/dev/null 2>&1; then
     && pass "init: writes nothing on conflict" || fail "init: writes nothing on conflict" "files written"
 
   dir="$tmp/init-bun-version"
-  mkdir -p "$dir" && printf '1.0.0
-' > "$dir/.bun-version"
+  mkdir -p "$dir" && printf '1.0.0\n' > "$dir/.bun-version"
   out=$(bash "$init" --kind app --name x --dir "$dir" --no-install 2>&1); code=$?
-  [ "$code" -eq 2 ] && [ "$(cat "$dir/.bun-version")" = 1.0.0 ]     && pass "init: keeps an existing .bun-version, exit 2" || fail "init: keeps an existing .bun-version, exit 2" "exit $code: $out"
+  [ "$code" -eq 2 ] && [ "$(cat "$dir/.bun-version")" = 1.0.0 ] \
+    && pass "init: keeps an existing .bun-version, exit 2" || fail "init: keeps an existing .bun-version, exit 2" "exit $code: $out"
+
+  dir="$tmp/init-crlf-gitignore"
+  mkdir -p "$dir" && printf 'node_modules/\r\ndist/\r\n' > "$dir/.gitignore"
+  bash "$init" --kind app --name x --dir "$dir" --no-install >/dev/null 2>&1
+  [ "$(tr -d '\r' < "$dir/.gitignore" | grep -cx 'node_modules/')" -eq 1 ] \
+    && pass "init: CRLF .gitignore lines not duplicated" || fail "init: CRLF .gitignore lines not duplicated" "node_modules/ repeated"
 
   out=$(bash "$init" --kind app --name Bad_Name --dir "$tmp/init-bad" --no-install 2>&1); code=$?
   [ "$code" -eq 2 ] && pass "init: invalid npm name, exit 2" || fail "init: invalid npm name, exit 2" "exit $code: $out"
