@@ -1,13 +1,13 @@
 # Roadmap: basalt Claude Code plugin
 
-> **Draft, not yet approved.** Built from the brainstorm in `docs/design.md`. Change it only through a proposal the user approves; log each change in progress.md under Decisions.
+> Approved 2026-10-31. Built from the brainstorm in `docs/design.md`. Change it only through a proposal the user approves; log each change in progress.md under Decisions.
 
 ## M1: Roadmap workflow
 
 Exit: `claude plugin validate .` passes, and `/basalt:init`, `/basalt:plan`, `/basalt:continue`, `/basalt:status` and `/basalt:check` have each been run on a real project with the plugin installed.
 
 - [x] **P1.1 Scaffold**: manifests, roadmap and progress templates, the three commands, the progress hooks. Done when: `claude plugin validate .` passes and the hook prints valid JSON for both events.
-- [ ] **P1.2 Hook tests**: a test script for `hooks/progress-context.sh` (no progress file, SessionStart, PostCompact, JSON escaping), run in CI. Done when: `bash tests/run.sh` passes locally and in GitHub Actions.
+- [x] **P1.2 Hook tests**: a test script for `hooks/progress-context.sh` (no progress file, SessionStart, PostCompact, JSON escaping), run in CI. Done when: `bash tests/run.sh` passes locally and in GitHub Actions.
 - [ ] **P1.3 Plain-language arguments (D7a)**: `references/plain-language-arguments.md`, applied to `plan`, `continue` and `status`. Done when: each command handles a free-text example by echoing `Interpreting as: …` and asks only for missing required values.
 - [ ] **P1.4 Basalt knowledge, index first (D7b)**: a `basalt-core` skill holding the core design doc split by section, a short index, and a script that refreshes it from `basalt-js/core`. Commands that make architecture decisions consult the index and cite sections. Done when: the index exists and a sample question is answered by opening only the cited section.
 - [ ] **P1.5 `/basalt:init`**: sets up a new Basalt project with the latest published `@basalt-js/ci` (versions looked up at run time, not hard-coded), its configs and scripts, then hands over to `/basalt:plan`. Done when: an empty folder becomes a project whose `bun run check` passes.

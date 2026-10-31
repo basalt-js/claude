@@ -6,7 +6,7 @@ This plugin is built with its own workflow: `.basalt/roadmap.md` is the plan and
 
 ## Rules
 
-- **Check:** `claude plugin validate .` must pass before calling work done.
+- **Check:** `claude plugin validate .` and `bash tests/run.sh` must pass before calling work done. Change a hook and its tests together.
 - **Commands are prompts.** Files in `commands/` are instructions the model follows. Write them as direct, numbered steps; say what to do when files are missing or git disagrees.
 - **Commands the model can't start by itself:** every command sets `disable-model-invocation: true`.
 - **Hooks are plain bash** with no dependencies beyond bash (no python3, no jq), because they run on users' machines, including Windows with Git Bash. Invoke them as `bash "${CLAUDE_PLUGIN_ROOT}/hooks/<script>.sh"`, so the executable bit doesn't matter. A hook that has nothing to say prints nothing and exits 0.

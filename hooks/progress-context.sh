@@ -20,15 +20,17 @@ json_escape() {
   text="${text//$'\t'/\\t}"
   text="${text//$'\r'/}"
   text="${text//$'\n'/\\n}"
-  printf '%s' "$text"
+  # JSON forbids raw control characters; drop the ones not escaped above.
+  printf '%s' "$text" | tr -d '\001-\010\013\014\016-\037'
 }
 
 current=$(grep -m1 '^Current:' "$progress")
 last=$(grep -m1 '^Last done:' "$progress")
 
 if [ "$event" = "PostCompact" ]; then
-  # Strip the template's HTML comments; cap the size in case the file has grown.
-  body=$(sed '/<!--/,/-->/d' "$progress" | head -n 80)
+  # Strip HTML comments (one-line ones first, so they don't open a range);
+  # cap the size in case the file has grown.
+  body=$(sed -e 's/<!--.*-->//' -e '/<!--/,/-->/d' "$progress" | head -n 80)
   context="Basalt roadmap state (re-added after compaction). Stay on the current phase.
 
 $body

@@ -1,0 +1,28 @@
+name: CI
+
+# Hooks run on users' machines, so the tests run on all three: Windows uses Git Bash,
+# macOS its stock bash 3.2.
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+permissions:
+  contents: read
+
+jobs:
+  hook-tests:
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest, macos-latest, windows-latest]
+    runs-on: ${{ matrix.os }}
+    steps:
+      - uses: actions/checkout@v6
+      - name: Hook tests
+        shell: bash
+        run: bash tests/run.sh
+      - name: Hook tests under /bin/bash 3.2
+        if: runner.os == 'macOS'
+        shell: bash
+        run: /bin/bash --version | head -n 1 && HOOK_BASH=/bin/bash bash tests/run.sh
