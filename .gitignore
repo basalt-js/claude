@@ -1,0 +1,6 @@
+.DS_Store
+*.swp
+*~
+
+# Local session state (mascot, live status). Roadmap and progress are committed.
+.basalt/session/

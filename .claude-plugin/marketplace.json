@@ -1,0 +1,19 @@
+{
+  "name": "basalt",
+  "description": "The official Claude Code plugin for Basalt, the micro-kernel TypeScript plugin framework.",
+  "owner": {
+    "name": "basalt-js"
+  },
+  "plugins": [
+    {
+      "name": "basalt",
+      "version": "0.1.0",
+      "source": "./",
+      "description": "Claude Code toolkit for Basalt projects: every project starts from an approved roadmap, progress is recorded at each phase boundary, and /basalt:continue picks up the next phase in a fresh session.",
+      "author": {
+        "name": "basalt-js"
+      },
+      "category": "development"
+    }
+  ]
+}

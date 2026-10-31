@@ -1,0 +1,13 @@
+{
+  "$schema": "https://json.schemastore.org/claude-code-plugin-manifest.json",
+  "name": "basalt",
+  "displayName": "Basalt",
+  "version": "0.1.0",
+  "description": "Claude Code toolkit for Basalt projects: every project starts from an approved roadmap, progress is recorded at each phase boundary, and /basalt:continue picks up the next phase in a fresh session.",
+  "author": {
+    "name": "basalt-js"
+  },
+  "repository": "https://github.com/basalt-js/claude",
+  "license": "MIT",
+  "keywords": ["basalt", "roadmap", "workflow", "micro-kernel", "typescript"]
+}
