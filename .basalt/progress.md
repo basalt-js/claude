@@ -19,7 +19,7 @@ Last done: P1.4 Plain-language arguments (D7a)
 - Exact forms (P1.4): `plan new "<description>"` / `revise "<change>"`; `continue [<phase id>] ["<note>"]`; `status [<milestone or phase id>]`. `continue` with a phase other than the next one asks first, since that reorders the roadmap.
 - Only quoted free text counts as exact; unquoted notes and descriptions get the `Interpreting as:` echo. The echo may come after reading the roadmap, but before the command's own work. A vague request echoes without the missing value and asks for it (P1.4).
 - Open: P1.8 unattended runs can open PRs but not merge them without the user; decide there whether to stack PRs or stop at the first one.
-- Open: the user said "if CI and the review are green, merge, don't wait for my approval" for the P1.3 PRs. D8 and `/basalt:continue` still require approval in the session. Ask the user whether merge-on-green should become the rule.
+- Merge on green (user, 2026-10-31, after P1.4): a phase PR squash-merges on its own once CI and the Claude review pass; no approval question. D8 in `docs/design.md`, the PR rule in `CLAUDE.md` and in the workspace `CLAUDE.md`, and `/basalt:continue` Step 5 still say to ask: change them in P1.5's PR, and follow the new rule from now on.
 
 ## Blockers / waiting on you
 
@@ -31,3 +31,4 @@ Last done: P1.4 Plain-language arguments (D7a)
 - ../core/docs/basalt-design.md: the doc to split by section (about 1,160 lines; Part V lists the decisions, §40 the milestones).
 - moku's `skills/moku-core/SKILL.md` and its `references/` (in the moku plugin cache) and its `spec-sync` skill: the index-first pattern and the refresh script to model.
 - CLAUDE.md: how command files and skills are written.
+- commands/continue.md Step 5, docs/design.md D8, CLAUDE.md: the merge-on-green change that also goes into P1.5's PR.
