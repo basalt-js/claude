@@ -222,7 +222,7 @@ claude/                          github.com/basalt-js/claude
     plugin.json                  name "basalt", version, description
     marketplace.json             makes the repo installable as a marketplace
   commands/                      one file per slash command
-    init.md                      /basalt:init       → new project with @basalt-js/ci tooling
+    init.md                      /basalt:init       → new project with @basalt-js/ci tooling (P1.6)
     plan.md                      /basalt:plan       → roadmap.md
     continue.md                  /basalt:continue   → next phase
     status.md                    /basalt:status     → where are we (read-only)
@@ -237,12 +237,13 @@ claude/                          github.com/basalt-js/claude
     ...
   references/
     plain-language-arguments.md  shared rules for free-text arguments (D7a)
-  templates/                     roadmap.md, progress.md
+  templates/                     roadmap.md, progress.md, init/ (the files /basalt:init writes)
   skills/                        knowledge loaded on demand, index first (D7b)
     basalt-core/                 the kernel API: the core design doc, split by section, with an index (P1.5)
     basalt-plugin/               plugin tiers and file contracts
   scripts/
     sync-basalt-core.sh          refreshes skills/basalt-core from basalt-js/core (P1.5)
+    init-project.sh              writes and installs a new project for /basalt:init (P1.6)
   hooks/
     hooks.json                   which script runs on which event
     mascot-state.sh              writes .basalt/session/state.json (idea 3)

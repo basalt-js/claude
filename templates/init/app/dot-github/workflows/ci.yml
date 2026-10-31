@@ -1,0 +1,19 @@
+name: CI
+
+# Thin caller. All logic lives in basalt-js/ci. Apps don't publish, so no build job.
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+permissions:
+  contents: read
+
+jobs:
+  ci:
+    uses: basalt-js/ci/.github/workflows/package-ci.yml@main
+    with:
+      bun-version: "{{bun_version}}"
+      typescript-versions: '["{{ts_minor}}"]'
+      test-script: test:coverage
+      build: false

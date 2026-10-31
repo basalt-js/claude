@@ -1,11 +1,11 @@
 # Progress
 
-Current: M1 → P1.6 `/basalt:init` (next)
-Last done: P1.5 Basalt knowledge, index first (D7b)
+Current: M1 → P1.7 `/basalt:check` (next)
+Last done: P1.6 `/basalt:init`
 
 ## State
 
-`claude plugin validate .` passes. `bash tests/run.sh` passes (57 tests: the hook, and now `scripts/sync-basalt-core.sh`); CI runs it on Ubuntu, macOS (also under /bin/bash 3.2) and Windows Git Bash. Every PR here, in core and in ci gets the Claude review (`claude / review`, required on `main`). `skills/basalt-core/` is pinned to core commit `1a7c213`; `bash scripts/sync-basalt-core.sh --check` reports drift.
+`claude plugin validate .` passes. `bash tests/run.sh` passes (82 tests: the hook, `sync-basalt-core.sh`, and `init-project.sh` in files-only mode, which needs bun). CI runs them on Ubuntu, macOS (also /bin/bash 3.2) and Windows Git Bash; a new `init` job runs the real install and `bun run check` for both kinds (not a required check yet). Every PR gets the Claude review (`claude / review`, required on `main`). `skills/basalt-core/` is pinned to core `1a7c213`.
 
 ## Decisions
 
@@ -18,6 +18,9 @@ Last done: P1.5 Basalt knowledge, index first (D7b)
 - P1.8: with merge on green, an unattended run can merge each phase PR and go on to the next phase; it stops at a rejected review it can't fix.
 - P1.5: the design doc is split one file per section (`## N.` → `NN-slug.md`; parts only group the index; appendices are sections), not per part, so a lookup opens 5–90 lines. Commands read `${CLAUDE_PLUGIN_ROOT}/skills/basalt-core/references/index.md` directly instead of loading the skill, and cite sections as `core §N`.
 - P1.5: the index has a hand-written part (rules, "Where to look" table) and a generated block (pin, section map). The sync script keeps the hand-written part and fails on routing links to sections that no longer exist. It pins the last commit that touched the doc, with no date, so `--check` is deterministic.
+- P1.6: `/basalt:init` has two kinds: `package` (published: tsdown build, publint + attw, the 12 KB size gate, `publish.yml`) and `app` (private, CI with `build: false`). Both mirror core's setup.
+- P1.6: versions are looked up when init runs: the latest `@basalt-js/ci`; its peers (Biome, ESLint, TypeScript) at the versions ci's own devDependencies pin, because the latest ESLint (10) is outside ci's `^9` peer; other tools at their latest, with `@vitest/coverage-istanbul` matched to Vitest. CI's `typescript-versions` and `bun-version` follow what was installed.
+- P1.6: the files are templates in `templates/init/` written by `scripts/init-project.sh` (testable, never overwrites); the command handles questions, the first commit (the one direct commit to `main`), GitHub and protection. Reusable workflows are called at `@main`, since ci's `v0.1.0` tag predates `pr-review.yml`.
 - P1.5: when core splits its doc into `spec/NN-*.md` (core M6), the sync script must switch to that folder.
 
 ## Blockers / waiting on you
@@ -26,7 +29,8 @@ Last done: P1.5 Basalt knowledge, index first (D7b)
 
 ## Read first next time
 
-- docs/design.md: D6 and the `/basalt:init` row in "The command set".
-- ../ci/README.md and ../ci/package.json: what `@basalt-js/ci` exports (configs, `basalt-release`, `basalt-size`, workflows) and how a package extends it.
-- ../core/package.json, biome.json, eslint.config.js, tsconfig.json, lefthook.yml, .github/workflows/: the reference setup `/basalt:init` should reproduce.
-- commands/plan.md and references/plain-language-arguments.md: how a command file and its Arguments section are written.
+- docs/design.md: the `/basalt:check` row in "The command set" (install, tooling versions, roadmap/progress/git agreement, `check usage`).
+- commands/status.md: the read-only report `/basalt:check` sits next to, and its git/progress agreement checks.
+- scripts/init-project.sh: the version policy `check` should compare a project against.
+- Deferred from PR #4's review, small fixes for `scripts/sync-basalt-core.sh`: indented code fences aren't detected, and a broken routing link is reported after the files are already written.
+- Not yet tried live: `/basalt:init` Step 5 (creating the GitHub repo, protection, the first CI run). P1.9's first real use covers it.

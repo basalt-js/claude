@@ -1,7 +1,7 @@
 name: CI
 
-# Hooks run on users' machines, so the tests run on all three: Windows uses Git Bash,
-# macOS its stock bash 3.2.
+# Hooks and scripts run on users' machines, so the tests run on all three: Windows uses
+# Git Bash, macOS its stock bash 3.2.
 on:
   push:
     branches: [main]
@@ -19,6 +19,8 @@ jobs:
     runs-on: ${{ matrix.os }}
     steps:
       - uses: actions/checkout@v6
+      # The init-project.sh tests need bun to write package.json.
+      - uses: oven-sh/setup-bun@v2
       - name: Hook tests
         shell: bash
         run: bash tests/run.sh
@@ -26,3 +28,18 @@ jobs:
         if: runner.os == 'macOS'
         shell: bash
         run: /bin/bash --version | head -n 1 && HOOK_BASH=/bin/bash bash tests/run.sh
+
+  # /basalt:init's Done-when: an empty folder becomes a project whose `bun run check` passes,
+  # with the versions published today.
+  init:
+    strategy:
+      fail-fast: false
+      matrix:
+        kind: [package, app]
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v6
+      - uses: oven-sh/setup-bun@v2
+      - name: Set up an empty folder and run its check
+        shell: bash
+        run: bash scripts/init-project.sh --kind ${{ matrix.kind }} --name demo-${{ matrix.kind }} --dir "$RUNNER_TEMP/demo"

@@ -1,0 +1,16 @@
+name: Claude review
+
+# Thin caller. The review prompt and the verdict logic live in basalt-js/ci (pr-review.yml).
+# Needs the CLAUDE_CODE_OAUTH_TOKEN or ANTHROPIC_API_KEY secret.
+on:
+  pull_request:
+    types: [opened, synchronize, reopened, ready_for_review]
+
+permissions:
+  contents: read
+  pull-requests: write
+
+jobs:
+  claude:
+    uses: basalt-js/ci/.github/workflows/pr-review.yml@main
+    secrets: inherit

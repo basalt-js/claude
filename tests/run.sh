@@ -1,8 +1,9 @@
 #!/usr/bin/env bash
-# Tests for hooks/progress-context.sh and scripts/sync-basalt-core.sh.
+# Tests for hooks/progress-context.sh, scripts/sync-basalt-core.sh and scripts/init-project.sh.
 #
 # Usage: bash tests/run.sh
-# Needs node to parse the hook's JSON. The hook itself needs only bash.
+# Needs node to parse the hook's JSON (the hook itself needs only bash), and bun for the
+# init-project.sh tests, which are skipped without it.
 # HOOK_BASH picks the bash that runs the hook (default: bash), e.g. /bin/bash for 3.2 on macOS.
 
 set -u
@@ -284,6 +285,76 @@ for link in $(grep -o 'sections/[A-Za-z0-9._-]*\.md' "$bundled/index.md" | sort 
   [ -f "$bundled/$link" ] || missing="$missing $link"
 done
 [ -z "$missing" ] && pass "bundled index: every link resolves" || fail "bundled index: every link resolves" "missing:$missing"
+
+# --- scripts/init-project.sh (files only; CI's init job installs and runs the check) ---
+
+init="$root/scripts/init-project.sh"
+if command -v bun >/dev/null 2>&1; then
+  dir="$tmp/init-package"
+  out=$(bash "$init" --kind package --name @acme/kit --description 'Kits & bits | with \ slashes' --repo acme/kit --dir "$dir" --no-install 2>&1); code=$?
+  [ "$code" -eq 0 ] && pass "init package: exits 0" || fail "init package: exits 0" "exit $code: $out"
+  for f in .github/workflows/ci.yml .github/workflows/publish.yml .github/workflows/claude-review.yml \
+    .gitignore .gitattributes .editorconfig .bun-version biome.json eslint.config.js tsconfig.json \
+    tsconfig.build.json tsdown.config.ts vitest.config.ts lefthook.yml bunfig.toml src/index.ts \
+    tests/unit/index.test.ts README.md package.json; do
+    [ -f "$dir/$f" ] || missing_files="${missing_files:-} $f"
+  done
+  [ -z "${missing_files:-}" ] && pass "init package: writes every file, dot- names become dotfiles" \
+    || fail "init package: writes every file, dot- names become dotfiles" "missing:$missing_files"
+  [ -d "$dir/.git" ] && pass "init package: git init" || fail "init package: git init" "no .git"
+  expect_lacks "init package: no dot- names left" 'dot-' "$(cd "$dir" && find . -path ./.git -prune -o -print)"
+  expect_contains "init package: description escaped in README" 'Kits & bits | with \ slashes' "$(cat "$dir/README.md")"
+  pkg=$(cat "$dir/package.json")
+  expect_contains "init package: name" '"name": "@acme/kit"' "$pkg"
+  expect_contains "init package: repository" '"url": "git+https://github.com/acme/kit.git"' "$pkg"
+  expect_contains "init package: build in check" 'bun run build && bun run validate && bun run size' "$pkg"
+  expect_lacks "init package: not private" '"private"' "$pkg"
+  expect_contains "init package: lefthook trusted" '"lefthook"' "$pkg"
+
+  dir="$tmp/init-app"
+  mkdir -p "$dir" && printf '# Mine\n' > "$dir/README.md" && printf 'node_modules/\nsecret.txt' > "$dir/.gitignore"
+  bash "$init" --kind app --name my-app --dir "$dir" --no-install >/dev/null 2>&1
+  pkg=$(cat "$dir/package.json")
+  expect_contains "init app: private" '"private": true' "$pkg"
+  expect_lacks "init app: no build" 'tsdown' "$pkg"
+  [ ! -e "$dir/.github/workflows/publish.yml" ] && [ ! -e "$dir/tsdown.config.ts" ] \
+    && pass "init app: no release workflow or build config" || fail "init app: no release workflow or build config" "found one"
+  expect_contains "init app: CI without the build job" 'build: false' "$(cat "$dir/.github/workflows/ci.yml")"
+  [ "$(cat "$dir/README.md")" = '# Mine' ] && pass "init: existing README kept" || fail "init: existing README kept" "README overwritten"
+  gi=$(cat "$dir/.gitignore")
+  [ "$(grep -cx 'secret.txt' "$dir/.gitignore")" -eq 1 ] && pass "init: .gitignore without a final newline keeps its last line" \
+    || fail "init: .gitignore without a final newline keeps its last line" "$(tail -n 3 "$dir/.gitignore")"
+  expect_contains "init: .gitignore gets missing lines" '.basalt/session/' "$gi"
+  [ "$(grep -cx 'node_modules/' "$dir/.gitignore")" -eq 1 ] && pass "init: .gitignore lines not duplicated" \
+    || fail "init: .gitignore lines not duplicated" "node_modules/ repeated"
+
+  dir="$tmp/init-conflict"
+  mkdir -p "$dir" && printf 'mine\n' > "$dir/biome.json"
+  out=$(bash "$init" --kind app --name x --dir "$dir" --no-install 2>&1); code=$?
+  [ "$code" -eq 2 ] && pass "init: refuses to overwrite, exit 2" || fail "init: refuses to overwrite, exit 2" "exit $code: $out"
+  expect_contains "init: names the file it won't overwrite" 'biome.json' "$out"
+  [ ! -e "$dir/package.json" ] && [ "$(cat "$dir/biome.json")" = mine ] \
+    && pass "init: writes nothing on conflict" || fail "init: writes nothing on conflict" "files written"
+
+  dir="$tmp/init-bun-version"
+  mkdir -p "$dir" && printf '1.0.0\n' > "$dir/.bun-version"
+  out=$(bash "$init" --kind app --name x --dir "$dir" --no-install 2>&1); code=$?
+  [ "$code" -eq 2 ] && [ "$(cat "$dir/.bun-version")" = 1.0.0 ] \
+    && pass "init: keeps an existing .bun-version, exit 2" || fail "init: keeps an existing .bun-version, exit 2" "exit $code: $out"
+
+  dir="$tmp/init-crlf-gitignore"
+  mkdir -p "$dir" && printf 'node_modules/\r\ndist/\r\n' > "$dir/.gitignore"
+  bash "$init" --kind app --name x --dir "$dir" --no-install >/dev/null 2>&1
+  [ "$(tr -d '\r' < "$dir/.gitignore" | grep -cx 'node_modules/')" -eq 1 ] \
+    && pass "init: CRLF .gitignore lines not duplicated" || fail "init: CRLF .gitignore lines not duplicated" "node_modules/ repeated"
+
+  out=$(bash "$init" --kind app --name Bad_Name --dir "$tmp/init-bad" --no-install 2>&1); code=$?
+  [ "$code" -eq 2 ] && pass "init: invalid npm name, exit 2" || fail "init: invalid npm name, exit 2" "exit $code: $out"
+  out=$(bash "$init" --kind lib --name x --dir "$tmp/init-bad" --no-install 2>&1); code=$?
+  [ "$code" -eq 2 ] && pass "init: unknown kind, exit 2" || fail "init: unknown kind, exit 2" "exit $code: $out"
+else
+  printf 'skip init-project.sh tests: bun is not installed\n'
+fi
 
 printf '\n%d passed, %d failed\n' "$passed" "$failed"
 [ "$failed" -eq 0 ]
