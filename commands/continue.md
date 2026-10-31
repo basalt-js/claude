@@ -16,7 +16,7 @@ The user typed: $ARGUMENTS
 Read it by the rules in `${CLAUDE_PLUGIN_ROOT}/references/plain-language-arguments.md`. The exact form is `[<phase id>] ["<note>"]`:
 
 - Empty: the next phase, `Current` in `progress.md`, or the open phase PR that Step 1 finds.
-- `<phase id>`, such as `P2.1`: do that phase. If it isn't the one Step 1 would pick, ask the user to confirm before switching branches: doing phases out of order changes the roadmap, and the change is logged under Decisions. When an open phase PR exists for another phase, name it in the question: resume it, or leave it open and start the named phase. A phase that is already ticked isn't redone; point to `/basalt:plan revise` instead.
+- `<phase id>`, such as `P2.1`: do that phase. If it isn't the one Step 1 would pick, ask the user to confirm before switching branches: doing phases out of order changes the roadmap, and the change is logged under Decisions. When an open phase PR exists for another phase, name it in the question: resume it, or leave it open and start the named phase. Say that the two PRs will then conflict on `.basalt/progress.md` and `.basalt/roadmap.md`, and record the parked PR under Blockers. For a phase run out of order, use the Read-first list and a Partial section only if they belong to that phase; otherwise read what its goal needs. A phase that is already ticked isn't redone; point to `/basalt:plan revise` instead.
 - `"<note>"`: guidance for this session, such as a focus or a constraint. Follow it while doing the phase; it never skips a step.
 
 In plain words, a phase named by its id or its title becomes the phase id, and the rest is the note. Only a note in quotes is exact; unquoted words are plain language and get the echo, even when all of them are the note.
