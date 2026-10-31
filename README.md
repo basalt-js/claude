@@ -8,6 +8,8 @@ A Claude Code plugin for projects built with [Basalt](https://github.com/basalt-
 
 Every project starts from a roadmap, and every session does one phase of it. Sessions stay small, so the model never works in a huge, degrading context.
 
+Every command takes plain words as well as its exact arguments, for example `/basalt:status what's left in content`. The command prints one line, `Interpreting as: /basalt:status M2`, and carries on, asking only for what it can't work out.
+
 | Command | What it does |
 |---|---|
 | `/basalt:plan` | Asks what you're building and drafts a roadmap of milestones and phases. Once you approve it, writes `.basalt/roadmap.md` and `.basalt/progress.md`. |
@@ -32,6 +34,7 @@ The plugin also adds the current position to Claude's context when a session sta
 | `.claude-plugin/` | Plugin and marketplace manifests |
 | `commands/` | The `/basalt:*` commands |
 | `templates/` | The roadmap and progress templates the commands follow |
+| `references/` | Rules every command shares, such as how plain-language arguments are read |
 | `hooks/` | Session-start and post-compaction context |
 | `docs/design.md` | The design: every idea, decision and open question |
 | `.basalt/` | This plugin's own roadmap and progress: it is built with its own workflow |

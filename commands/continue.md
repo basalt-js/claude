@@ -1,7 +1,7 @@
 ---
 description: Pick up the roadmap where the last session stopped and do the next phase.
 allowed-tools: Read, Write, Edit, Bash, Glob, Grep, AskUserQuestion, Agent
-argument-hint: [optional note for this session]
+argument-hint: [phase id] [note for this session]
 disable-model-invocation: true
 ---
 
@@ -9,7 +9,25 @@ disable-model-invocation: true
 
 Do exactly one phase of the roadmap, from start to a clean finish. Each phase gets its own session, so conversations stay small. Each phase lands as one pull request: it is worked on a branch, reviewed, and squash-merged only after the user approves.
 
-Note from the user for this session (may be empty): $ARGUMENTS
+## Arguments
+
+The user typed: $ARGUMENTS
+
+Read it by the rules in `${CLAUDE_PLUGIN_ROOT}/references/plain-language-arguments.md`. The exact form is `[<phase id>] ["<note>"]`:
+
+- Empty: the next phase, `Current` in `progress.md`, or the open phase PR that Step 1 finds.
+- `<phase id>`, such as `P2.1`: do that phase. If it isn't the one Step 1 would pick, ask the user to confirm before Step 3: doing phases out of order changes the roadmap, and the change is logged under Decisions. A phase that is already ticked isn't redone; point to `/basalt:plan revise` instead.
+- `"<note>"`: guidance for this session, such as a focus or a constraint. Follow it while doing the phase; it never skips a step.
+
+In plain words, a phase named by its id or its title becomes the phase id, and the rest is the note. Only a note in quotes is exact; unquoted words are plain language and get the echo, even when all of them are the note.
+
+| The user typed | Read as |
+|---|---|
+| `/basalt:continue keep the commits small` | `Interpreting as: /basalt:continue "keep the commits small"` |
+| `/basalt:continue do the RSS phase, reuse the markdown pipe` | `Interpreting as: /basalt:continue P2.2 "reuse the markdown pipe"`, then confirm, if P2.2 isn't next |
+| `/basalt:continue the content phase` (M2 has several) | ask which phase, the next one in M2 first |
+| `/basalt:continue P2.1` | exact: no echo |
+| `/basalt:continue add a docs milestone` | not this command: point to `/basalt:plan revise "add a docs milestone"` |
 
 ## Step 1: Load where we are
 
