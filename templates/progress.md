@@ -1,7 +1,7 @@
 # Progress
 
 Current: <M? → P?.? phase title> (next)
-Last done: <P?.? phase title> (<commit hash>), or "nothing yet"
+Last done: <P?.? phase title>, or "nothing yet"
 
 <!--
 Rules for writing this file:
@@ -9,11 +9,13 @@ Rules for writing this file:
 - Keep it to about one screen. It is read at the start of every session.
 - "Current" and "Last done" must be the first two lines: hooks read them.
 - If a session stops mid-phase, add a "Partial" section and keep "Current" on that phase.
+- "Last done" names the phase, not a commit: the phase lands as a squash-merged PR whose
+  commit hash isn't known yet. Its commit subject ends with the phase id, so git log finds it.
 -->
 
 ## State
 
-Branch <branch>, <clean | uncommitted: files>. <Check command>: <passes | fails: what>.
+<Check command>: <passes | fails: what>. <Anything about the repo the next session should know.>
 
 ## Partial
 

@@ -11,7 +11,7 @@ Every project starts from a roadmap, and every session does one phase of it. Ses
 | Command | What it does |
 |---|---|
 | `/basalt:plan` | Asks what you're building and drafts a roadmap of milestones and phases. Once you approve it, writes `.basalt/roadmap.md` and `.basalt/progress.md`. |
-| `/basalt:continue` | Reads where the last session stopped, does the next phase, runs its checks, commits, updates progress, and stops. Run it again in a fresh conversation for the next phase. |
+| `/basalt:continue` | Reads where the last session stopped and does the next phase on its own branch. It runs the phase's checks, updates progress, and opens a pull request. It fixes what CI or the Claude review rejects, squash-merges once you approve, and stops. Run it again in a fresh conversation for the next phase. |
 | `/basalt:status` | Shows the current milestone and phase, what's done, and what's next. Changes nothing. |
 
 The plugin also adds the current position to Claude's context when a session starts, and again after a conversation is compacted.
