@@ -16,7 +16,7 @@ The user typed: $ARGUMENTS
 Read it by the rules in `${CLAUDE_PLUGIN_ROOT}/references/plain-language-arguments.md`. The exact form is `[<phase id>] ["<note>"]`:
 
 - Empty: the next phase, `Current` in `progress.md`, or the open phase PR that Step 1 finds.
-- `<phase id>`, such as `P2.1`: do that phase. If it isn't the one Step 1 would pick, ask the user to confirm before Step 3: doing phases out of order changes the roadmap, and the change is logged under Decisions. A phase that is already ticked isn't redone; point to `/basalt:plan revise` instead.
+- `<phase id>`, such as `P2.1`: do that phase. If it isn't the one Step 1 would pick, ask the user to confirm before switching branches: doing phases out of order changes the roadmap, and the change is logged under Decisions. When an open phase PR exists for another phase, name it in the question: resume it, or leave it open and start the named phase. A phase that is already ticked isn't redone; point to `/basalt:plan revise` instead.
 - `"<note>"`: guidance for this session, such as a focus or a constraint. Follow it while doing the phase; it never skips a step.
 
 In plain words, a phase named by its id or its title becomes the phase id, and the rest is the note. Only a note in quotes is exact; unquoted words are plain language and get the echo, even when all of them are the note.
@@ -33,7 +33,7 @@ In plain words, a phase named by its id or its title becomes the phase id, and t
 
 1. Read `.basalt/progress.md` and `.basalt/roadmap.md`. If either is missing, stop and tell the user to run `/basalt:plan` first.
 2. Check them against git: run `git status`, `git log --oneline -10` and `git log --oneline --grep "<last done phase id>"`. If progress says something git contradicts (a "last done" phase with no commit on `main`, uncommitted changes nobody recorded), **git wins**: tell the user what differs and correct `progress.md` before going on.
-3. Check for a phase PR that hasn't merged yet: `gh pr list --state open --json number,title,headRefName,isDraft --jq '.[] | select(.headRefName | startswith("basalt/"))'`. If there is one, switch to its branch and say you're resuming it. If its work is finished, go straight to Step 5; otherwise continue from its Partial section.
+3. Check for a phase PR that hasn't merged yet: `gh pr list --state open --json number,title,headRefName,isDraft --jq '.[] | select(.headRefName | startswith("basalt/"))'`. If there is one, switch to its branch and say you're resuming it, unless the arguments name a different phase (see Arguments). If its work is finished, go straight to Step 5; otherwise continue from its Partial section.
 4. Read every file under "Read first next time".
 
 ## Step 2: Say where you're picking up

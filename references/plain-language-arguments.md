@@ -21,7 +21,7 @@ Print the `Interpreting as:` line as soon as you have read what you need to reso
 - Ask for the smallest missing piece, never for a restatement of the whole request.
 - Use AskUserQuestion when the command has it, with the candidate readings as options, the recommended one first. Without it, ask in one short line and wait.
 - Never invent a required value (a phase id, a description, a milestone) to avoid asking. A wrong guess costs more than one question.
-- Ids are matched by meaning: "the plain-language phase" is the phase whose title says so, and "the mascot milestone" fits both M2 and M3 here, so it is a question.
+- Ids are matched by meaning, against the project's own roadmap: "the RSS phase" is the phase whose title says so. Words that fit two milestones or two phases are a question, not a guess.
 
 ## Plain language never skips a step
 
