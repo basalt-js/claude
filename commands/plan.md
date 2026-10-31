@@ -45,6 +45,7 @@ Then, starting from the description in the arguments if there is one, ask the us
 - **Phases** split each milestone into steps that each fit in **one session**: one coherent change, finished with its tests, and committed. When unsure, make phases smaller. A phase that touches many unrelated areas should be split.
 - Each phase has a one-line goal and a **Done when** check.
 - Put risky or uncertain work early, so problems show up before much is built on top.
+- **Basalt projects** (the project's `package.json` depends on an `@basalt-js/*` package, or it is one of the `basalt-js` repos): before drafting, read `${CLAUDE_PLUGIN_ROOT}/skills/basalt-core/references/index.md` and follow its rules. Open only the sections the roadmap's architecture choices depend on, and cite each one in the milestone or phase it shapes, for example `(core §25)`.
 
 ## Step 4: Get approval
 

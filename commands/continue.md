@@ -48,6 +48,7 @@ If `progress.md` lists a blocker that is waiting on the user, raise it now and w
 2. Do the work:
    - Stay inside the phase's goal. Note anything else you find for a later phase instead of doing it now.
    - Follow the project's own rules (`CLAUDE.md`, lint, tests).
+   - **Architecture decisions in a Basalt project** (it depends on an `@basalt-js/*` package, or it is one of the `basalt-js` repos): read `${CLAUDE_PLUGIN_ROOT}/skills/basalt-core/references/index.md` first and follow its rules. Open only the section it points to, and cite it, for example `core §27.4`, in the Decisions you record and in the PR body.
    - If you discover the roadmap is wrong (a missing phase, a wrong order, a phase too big for one session), stop and propose the change to the user. Change the roadmap only after they approve, and log it under Decisions.
    - If you reach a decision the user should make, ask them. Don't guess on things that are expensive to undo.
 

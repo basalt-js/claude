@@ -239,8 +239,10 @@ claude/                          github.com/basalt-js/claude
     plain-language-arguments.md  shared rules for free-text arguments (D7a)
   templates/                     roadmap.md, progress.md
   skills/                        knowledge loaded on demand, index first (D7b)
-    basalt-core/                 the kernel API: the core design doc, split by section, with an index
+    basalt-core/                 the kernel API: the core design doc, split by section, with an index (P1.5)
     basalt-plugin/               plugin tiers and file contracts
+  scripts/
+    sync-basalt-core.sh          refreshes skills/basalt-core from basalt-js/core (P1.5)
   hooks/
     hooks.json                   which script runs on which event
     mascot-state.sh              writes .basalt/session/state.json (idea 3)
