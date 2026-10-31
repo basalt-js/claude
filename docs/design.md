@@ -98,10 +98,10 @@ When a phase finishes, the agent ticks it in the roadmap and rewrites `.basalt/p
 ```md
 # Progress
 Current: M1 → P1.3 Tests for routing (next)
-Last done: P1.2 Home and post pages (commit 3f2a91c)
+Last done: P1.2 Home and post pages
 
 ## State
-Branch main, clean. `bun run check` passes.
+`bun run check` passes.
 
 ## Decisions
 - Posts use slugs, not ids (P1.2)
@@ -114,7 +114,7 @@ Branch main, clean. `bun run check` passes.
 - tests/integration/routing.test.ts
 ```
 
-Each session ends cleanly at a phase boundary: the phase is done, progress is written, everything is committed. If a session has to stop mid-phase, the agent writes a "partial" note under the current phase so nothing is lost.
+Each session ends cleanly at a phase boundary: the phase is done, progress is written, and everything is in one pull request (D8). If a session has to stop mid-phase, the agent writes a "partial" note under the current phase so nothing is lost.
 
 ### Step 3: `/basalt:continue` does the next thing
 
@@ -122,7 +122,7 @@ Each session ends cleanly at a phase boundary: the phase is done, progress is wr
 2. Checks them against `git status` and `git log`. Git wins if they disagree, and the agent says so.
 3. Opens the "read first" files.
 4. Says in one or two lines where it is picking up, then starts the next phase.
-5. At the end of the phase: runs the exit checks, commits, updates progress, and stops, so the next phase gets a fresh session.
+5. At the end of the phase: runs the exit checks, updates progress, commits on the phase branch and opens a PR. It fixes what CI or the Claude review rejects, squash-merges once the user approves, and stops, so the next phase gets a fresh session.
 
 ### Changing the plan
 
@@ -130,7 +130,7 @@ Plans change. When the agent finds the roadmap is wrong (a missing phase, a wron
 
 **Open questions:**
 - Should `/basalt:continue` stop after one phase, or keep going while the session is still small?
-- Commit automatically at each phase end, or ask first?
+- ~~Commit automatically at each phase end, or ask first?~~ Answered by D8: commit and open the PR automatically, merge only after the user approves.
 - One roadmap per project, or allow parallel tracks (e.g. a `docs` track next to the main one)?
 
 ---
