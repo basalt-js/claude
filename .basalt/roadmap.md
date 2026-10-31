@@ -4,12 +4,17 @@
 
 ## M1: Roadmap workflow
 
-Exit: `claude plugin validate .` passes, and `/basalt:plan`, `/basalt:continue` and `/basalt:status` have each been run on a real project with the plugin installed.
+Exit: `claude plugin validate .` passes, and `/basalt:init`, `/basalt:plan`, `/basalt:continue`, `/basalt:status` and `/basalt:check` have each been run on a real project with the plugin installed.
 
 - [x] **P1.1 Scaffold**: manifests, roadmap and progress templates, the three commands, the progress hooks. Done when: `claude plugin validate .` passes and the hook prints valid JSON for both events.
 - [ ] **P1.2 Hook tests**: a test script for `hooks/progress-context.sh` (no progress file, SessionStart, PostCompact, JSON escaping), run in CI. Done when: `bash tests/run.sh` passes locally and in GitHub Actions.
-- [ ] **P1.3 First real use**: install the plugin locally, run `/basalt:plan` on `basalt-js/core` from its §40 milestones, then one `/basalt:continue` session. Fix what's rough in the commands. Done when: core has an approved `.basalt/roadmap.md` and one phase was finished through `/basalt:continue`.
-- [ ] **P1.4 Release 0.1.0**: README install steps, CHANGELOG, tag `v0.1.0`, GitHub release. Done when: `/plugin marketplace add basalt-js/claude` then `/plugin install basalt@basalt` works in a clean setup.
+- [ ] **P1.3 Plain-language arguments (D7a)**: `references/plain-language-arguments.md`, applied to `plan`, `continue` and `status`. Done when: each command handles a free-text example by echoing `Interpreting as: …` and asks only for missing required values.
+- [ ] **P1.4 Basalt knowledge, index first (D7b)**: a `basalt-core` skill holding the core design doc split by section, a short index, and a script that refreshes it from `basalt-js/core`. Commands that make architecture decisions consult the index and cite sections. Done when: the index exists and a sample question is answered by opening only the cited section.
+- [ ] **P1.5 `/basalt:init`**: sets up a new Basalt project with the latest published `@basalt-js/ci` (versions looked up at run time, not hard-coded), its configs and scripts, then hands over to `/basalt:plan`. Done when: an empty folder becomes a project whose `bun run check` passes.
+- [ ] **P1.6 `/basalt:check`**: diagnostics for the install, tooling versions, and roadmap/progress/git agreement, plus `check usage` for the plugin's token footprint. Done when: it reports correctly on a healthy project and on one where progress and git disagree.
+- [ ] **P1.7 Unattended runs (D7c)**: `/basalt:continue` offers a ready-to-paste `/goal` line with a turn cap, and a `--continue` flag that keeps going but pauses on its own when the conversation gets large. Done when: two phases run back to back unattended in a test project and stop at the cap.
+- [ ] **P1.8 First real use**: install the plugin locally, run `/basalt:plan` on `basalt-js/core` from its §40 milestones, then one `/basalt:continue` session. Fix what's rough in the commands. Done when: core has an approved `.basalt/roadmap.md` and one phase was finished through `/basalt:continue`.
+- [ ] **P1.9 Release 0.1.0**: README install steps, CHANGELOG, tag `v0.1.0`, GitHub release. Done when: `/plugin marketplace add basalt-js/claude` then `/plugin install basalt@basalt` works in a clean setup.
 
 ## M2: Mascot in the status line
 

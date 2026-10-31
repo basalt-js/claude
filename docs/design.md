@@ -14,6 +14,8 @@
 | D3 | The mascot is a **desktop overlay**: a small always-on-top window in the screen corner (idea 3). |
 | D4 | The plugin gets **its own repo**, modelled on `moku-labs/claude` (see "Repo layout" below). |
 | D5 | The mascot overlay app **lives in the plugin repo**, under `mascot/`. Its per-OS builds are published as release downloads of that repo. |
+| D6 | `/basalt:init` and `/basalt:check` are part of M1 (see "Commands" below). |
+| D7 | Every command follows three conventions taken from moku: (a) plain-language arguments, (b) bundled knowledge read index-first, (c) unattended runs only on request (see "Conventions for every command" below). |
 
 ---
 
@@ -219,9 +221,11 @@ claude/                          github.com/basalt-js/claude
     plugin.json                  name "basalt", version, description
     marketplace.json             makes the repo installable as a marketplace
   commands/                      one file per slash command
+    init.md                      /basalt:init       → new project with @basalt-js/ci tooling
     plan.md                      /basalt:plan       → roadmap.md
     continue.md                  /basalt:continue   → next phase
     status.md                    /basalt:status     → where are we (read-only)
+    check.md                     /basalt:check      → diagnostics, token footprint
     interface.md                 /basalt:interface  → start the mascot overlay
     council.md                   /basalt:council    → hard-decision discussion
     lessons.md                   /basalt:lessons    → review and prune lessons
@@ -230,8 +234,11 @@ claude/                          github.com/basalt-js/claude
     council-devils-advocate.md
     council-security.md
     ...
-  skills/                        knowledge loaded on demand
-    basalt-core/                 the kernel API, with the design doc vendored
+  references/
+    plain-language-arguments.md  shared rules for free-text arguments (D7a)
+  templates/                     roadmap.md, progress.md
+  skills/                        knowledge loaded on demand, index first (D7b)
+    basalt-core/                 the kernel API: the core design doc, split by section, with an index
     basalt-plugin/               plugin tiers and file contracts
   hooks/
     hooks.json                   which script runs on which event
@@ -253,11 +260,49 @@ claude/                          github.com/basalt-js/claude
 
 ---
 
+## Commands, and what we took from moku's
+
+Every `/moku:*` command (moku v0.60.0) was reviewed against this design. Moku's `/moku:build` runs one wave per invocation by default and stops "to prevent context exhaustion", which is the same choice as D1.
+
+### The command set
+
+| Command | When | What it does |
+|---|---|---|
+| `/basalt:init` | M1 (D6) | Sets up a new Basalt project: installs `@basalt-js/ci` and extends its Biome, ESLint and TypeScript configs, adds the standard scripts, then hands over to `/basalt:plan`. |
+| `/basalt:plan` | M1, built | Asks, drafts and gets approval for the roadmap. Later gains `--deep` (research before drafting) and a `migrate` verb. |
+| `/basalt:continue` | M1, built | Does one phase, checks, commits, updates progress, stops. Offers an unattended run (D7c). |
+| `/basalt:status` | M1, built | Read-only position report. |
+| `/basalt:check` | M1 (D6) | Diagnostics: the install, tooling versions, whether roadmap, progress and git agree. `check usage` reports the plugin's token footprint. Once `app.inspect()` exists (core M5): the plugin dependency graph and events nobody listens to. |
+| `/basalt:interface` | M2–M3 | Starts the mascot overlay. |
+| `/basalt:lessons` | M4 | Lists, reviews and prunes lessons. |
+| `/basalt:council` | M5 | Hard-decision discussion (D2). |
+| `/basalt:plan migrate` | Later | A roadmap for porting existing code. First target: **Moku → Basalt**, using the mapping table in the core design doc (§19). |
+| `/basalt:upgrade` | Later, after core's first breaking release | Moves a project to newer `@basalt-js/*` versions and applies the code changes they need, from a migration list. |
+| `/basalt:design`, `/basalt:e2e` | Later, with `@basalt-js/web` | UI design exploration and browser testing. They are web-specific. |
+
+### Moku commands we don't copy as commands
+
+| moku | Instead |
+|---|---|
+| `brainstorm` | `/basalt:plan --deep` for unclear projects; the council for hard decisions. |
+| `build`, `next` | Both are `/basalt:continue`. From `build` we take three things: a `--continue` flag that keeps going but pauses on its own when the conversation gets large; a cheap review of the phase's changes before committing; and stopping when the same error keeps coming back after fixes. |
+| `clean` | Our state is committed and permanent, so there's nothing temporary to delete. We take its summary idea: when the last milestone finishes, `/basalt:continue` writes a short cycle summary to `.basalt/history.md`, which also feeds lessons. |
+
+### Conventions for every command (D7)
+
+**a. Plain-language arguments.** Every command accepts free text as well as exact arguments: `/basalt:plan a blog with markdown posts`, `/basalt:check is my tooling up to date`. The command maps the text onto its arguments, echoes one line, `Interpreting as: …`, and carries on. It asks only for a missing required value, never for a restatement. Exact arguments are used as given, with no echo. Plain language never skips an approval step. The rules live in one shared file, `references/plain-language-arguments.md`, which every command points to.
+
+**b. Index first, read on demand.** The plugin bundles Basalt's knowledge (the core design doc, later the framework specs and tooling versions) in a skill, split into sections with a short index. Commands and agents read the index and open only the section they need, so the bundled docs cost almost nothing until used. Every command that makes an architecture decision is told to consult the index first and cite the section it relied on, as moku does with its spec.
+
+**c. Unattended runs, opt-in.** `/basalt:continue` can offer a ready-to-paste `/goal` line (Claude Code v2.1.139+) that keeps running phases until a condition holds or a turn cap is reached. For example: "progress.md shows M1 done, or stop after 30 turns". It is never the default: running several phases in one session grows that session, which is what D1 avoids. When it is used, the session still pauses on its own when the conversation gets large.
+
+---
+
 ## Suggested order
 
 | # | Build | Why this order |
 |---|---|---|
-| 1 | `/basalt:plan` + `progress.md` + `/basalt:continue` | The core workflow every project uses; cheapest; no dependencies |
+| 1 | `/basalt:plan` + `progress.md` + `/basalt:continue`, then `/basalt:init` and `/basalt:check` | The core workflow every project uses; cheapest; no dependencies |
 | 2 | Mascot v1 in the status line, then the overlay | Zero token cost; the hook wiring is reused by everything else |
 | 3 | Lessons captured at phase boundaries + review | Builds on the phase boundaries from #1 |
 | 4 | `/basalt:council` with 3 roles and 2 rounds | Only needed for hard projects; the budget rules need real usage to tune |
